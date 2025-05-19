@@ -167,6 +167,7 @@ streamlit run app.py
 
 - [ThePerformer0](https://github.com/ThePerformer0)
 - Email : [fjimmywilson@gmail.com](fjimmywilson@gmail.com)
+- WhatsApp : +237656597799
 
 Ne vous inquitez pas j'ai kiffé faire ce projet, vous n'avez plus qu'à regarder les notebooks et vous amuser à réentrainer les modèles.
 
