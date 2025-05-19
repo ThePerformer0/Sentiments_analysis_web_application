@@ -8,11 +8,12 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 import nltk
 
-# Téléchargement des ressources NLTK
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+# Téléchargement silencieux des ressources NLTK nécessaires
+for resource in ['punkt', 'punkt_tab', 'stopwords', 'wordnet', 'omw-1.4']:
+    try:
+        nltk.data.find(resource)
+    except LookupError:
+        nltk.download(resource, quiet=True)
 
 # Configuration de la page
 st.set_page_config(
