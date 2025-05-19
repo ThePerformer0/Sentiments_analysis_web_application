@@ -170,8 +170,6 @@ streamlit run app.py
 - WhatsApp : +237656597799
 
 Ne vous inquitez pas j'ai kiffé faire ce projet, vous n'avez plus qu'à regarder les notebooks et vous amuser à réentrainer les modèles.
-- [ThePerformer0](https://github.com/ThePerformer0)  
-Projet développé dans l’organisation **INFO-DECISIO** pour le cours d’informatique décisionnel.
 
 ---
 
