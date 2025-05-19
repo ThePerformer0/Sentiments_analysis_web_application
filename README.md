@@ -1,129 +1,90 @@
 # Analyse de Sentiment sur des Commentaires Textuels
 
-Projet réalisé dans le cadre du cours d’informatique décisionnel de l’organisation **INFO-DECISIO**.  
-L’objectif : construire un pipeline robuste pour prédire le **sentiment** (positif / neutre / négatif) de commentaires issus des réseaux sociaux, en s’appuyant sur les techniques modernes d’analyse de données et de machine learning.
+Ce projet vise à prédire automatiquement le **sentiment** (positif, neutre, négatif) de commentaires issus des réseaux sociaux. Il a été développé dans le cadre de mon apprentissage personnel pour mais surtout pour montrer à ma communauter comment on entraine un modèle et comment on peut l'utiliser dans une application web.
+
+> **💡 Important :**
+> - Une première version du modèle, basée sur un petit dataset, a montré ses limites en production.
+> - Une seconde version, plus robuste, a été développée et intégrée à l’application web Streamlit.
+> - Ce README explique la démarche, les choix, et guide l’utilisateur pour utiliser l’application.
 
 ---
 
 ## 📋 Contexte & Objectifs
 
-L’analyse automatique des opinions (sentiment analysis) est cruciale pour de nombreux métiers : veille, réputation, marketing, etc.  
-Ce projet vise à :
+L’analyse des opinions (sentiment analysis) est essentielle pour la veille, le marketing, la réputation, etc.  
+Ce projet propose :
 
-- Déployer un pipeline complet : exploration, nettoyage, vectorisation, modélisation, évaluation et sauvegarde.
-- Rendre le processus reproductible et facilement intégrable (préparation à une application web).
-- Sélectionner le modèle le plus performant et justifier ce choix selon les résultats obtenus.
+- Un pipeline complet : exploration, nettoyage, vectorisation, modélisation, évaluation et sauvegarde.
+- Une application web interactive pour tester le modèle sur vos propres textes.
+- Une justification transparente des choix de modèles et de données.
 
 ---
 
-## 📦 Données
+## 🚦 Deux Générations de Modèles
 
-- **Source** : [Kaggle – Sentiment Analysis EDA and Prediction (input)](https://www.kaggle.com/code/alokkumar2507/sentiment-analysis-eda-and-prediction/input)
-- **Fichier** : `data/sentiment_analysis.csv`
-  > **NB :** Télécharger manuellement le jeu de données sur Kaggle et le placer dans le dossier `data/` à la racine du projet.
+### 1. Modèle Initial (Dataset Restreint)
+
+- Entraîné sur un petit dataset de commentaires sociaux.
+- Pipeline reproductible (prétraitement, vectorisation TF-IDF, modèles classiques).
+- Résultats honnêtes mais limités par le manque de données : le modèle connaissait peu de vocabulaire et généralisait mal sur de nouveaux textes.
+- **Problème identifié** : lors de l’intégration dans l’application web (voir `app.py`), trop d’erreurs et de prédictions incohérentes.
+
+### 2. Nouveau Modèle (twitter_sentiment_model_v2)
+
+Pour pallier cela, j'ai entrainé un **nouveau modèle** :
+
+- **Dossier associé** : [`twitter_sentiment_model_v2/`](./twitter_sentiment_model_v2)
+- **Dataset** : [Sentiment140 (Kaggle)](https://www.kaggle.com/datasets/kazanova/sentiment140)
+  - 1,6 million de tweets labellisés (positif/négatif)
+- **Scripts** :
+  - `prepare_twitter_data.py` : prétraitement avancé
+  - `train_twitter_model.py` : entraînement du modèle Naive Bayes binaire
+- **Modèles fournis** :
+  - `twitter_model.pkl` et `twitter_vectorizer.pkl`
+- **Performances** :
+  - Précision globale : **76,8 %**
+  - Support équilibré entre sentiments positifs et négatifs
+  - Scores F1 équivalents pour chaque classe (0,77)
+
+#### ⚠️ Limitation actuelle
+
+Le nouveau modèle est **binaire** : il distingue uniquement les sentiments positifs et négatifs (aucune classe « neutre » dans le dataset Sentiment140).  
+Les textes neutres seront donc classés dans l’une des deux catégories : à prendre en compte dans l’interprétation des résultats.
+
+> **Pour plus de détails sur le pipeline d’entraînement et le dataset, voir le README dans `twitter_sentiment_model_v2/`.**
 
 ---
 
 ## 🗂️ Structure du projet
 
-- `notebooks/1_data_exploration.ipynb` : Analyse exploratoire (EDA)
-- `notebooks/2_data_preprocessing.ipynb` : Nettoyage et vectorisation des textes
-- `notebooks/3_model_training_evaluation.ipynb` : Modélisation et évaluation
-- `data/` : Contient le dataset
-- `models/` : Contient les modèles et vectoriseurs sauvegardés
-- `README.md` : Ce document
+- `app.py` : Application web Streamlit (racine du projet)
+- `notebooks/` : Analyse exploratoire, prétraitement et modélisation du premier pipeline
+- `data/` : Jeux de données (à placer manuellement, voir instructions)
+- `models/` : Modèles et vectoriseurs du premier pipeline
+- `twitter_sentiment_model_v2/` : Scripts, modèles et README du second pipeline
+- `README.md` : Ce document
 
 ---
 
-## 🚦 Pipeline du projet
+## ⚙️ Prérequis & Installation
 
-### 1. Analyse exploratoire des données (EDA)
+### 1. Clone le repo
 
-**Objectifs** :
-- Comprendre la structure et la qualité du dataset
-- Analyser la distribution des sentiments
-- Identifier les valeurs manquantes
-- Explorer les caractéristiques textuelles (longueur, mots fréquents)
-- Visualiser via graphiques et nuages de mots
-
----
-
-### 2. Prétraitement des données textuelles
-
-**Étapes clés** :
-- **Nettoyage** : conversion en minuscules, suppression des URLs, mentions, hashtags, chiffres et ponctuations.
-- **Tokenisation & Lemmatisation** (NLTK) : segmentation en mots, suppression des stopwords anglais, réduction à la racine.
-- **Vectorisation** : transformation en vecteurs numériques via **TF-IDF** (maximum 5000 termes, min_df=5, max_df=0.8).
-- **Split train/test** : division 80/20, stratification sur la cible pour respecter la répartition des classes.
-
-**Exemple de distribution après split** :
-- **Train** : neutral ~40%, positive ~33%, negative ~27%
-- **Test** : proportions similaires
-
----
-
-### 3. Modélisation et évaluation
-
-**Modèles testés** :
-- **Naive Bayes Multinomial** : simple et efficace pour du texte
-- **Régression Logistique** : baseline linéaire interprétable
-- **SVM linéaire (LinearSVC)** : performant en haute dimension (texte vectorisé)
-
-**Métriques utilisées** :
-- Accuracy
-- Precision, Recall, F1-score (moyenne pondérée & par classe)
-- Matrice de confusion détaillée
-- Analyse du déséquilibre entre classes
-
-**Extrait de résultats (test set)** :
-
-| Modèle                  | Accuracy | Precision (weighted) | Recall (weighted) | F1 (weighted) |
-|-------------------------|----------|----------------------|-------------------|---------------|
-| Naive Bayes Multinomial | 0.6200   | 0.6359               | 0.6200            | 0.6124        |
-| Régression Logistique   | 0.6400   | 0.6601               | 0.6400            | 0.6309        |
-| Linear SVM              | **0.6500**   | 0.6493               | **0.6500**            | **0.6430**        |
-
-> - **Linear SVM** > meilleure accuracy & F1 global.
-> - Tous les modèles ont du mal sur la classe "negative", mais Linear SVM équilibre mieux les prédictions et diminue le biais sur la classe "neutral".
-> - La Régression Logistique est très précise sur "positive" mais plus biaisée vers "neutral".
-
----
-
-### 4. Sélection et justification du modèle final
-
-Après analyse :
-
-- **Linear SVM** est retenu pour :
-  - Sa meilleure performance globale (accuracy & F1 pondéré)
-  - Son rappel "negative" légèrement meilleur
-  - Moins de biais vers la classe majoritaire
-  - Rapidité et compacité pour une intégration web future
-
----
-
-### 5. Sauvegarde et perspectives d’intégration
-
-- **Le modèle SVM entraîné** et le **vectoriseur TF-IDF** sont sauvegardés dans `models/` (`linear_svc_model.pkl`, `tfidf_vectorizer.pkl`) via `pickle` pour un futur déploiement (API ou app web).
-- **Prochaines pistes** :
-  - Tunings d’hyperparamètres
-  - Tests avec d’autres méthodes de vectorisation (embeddings)
-  - Expérimentations avec des architectures avancées (deep learning)
-
----
-
-## ⚙️ Prérequis & installation
-
-- Python ≥ 3.7
-- Jupyter Notebook
-- Bibliothèques principales :  
-  `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `nltk`, `wordcloud`
-
-**Installation rapide** :
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn nltk wordcloud
+git clone https://github.com/ThePerformer0/Sentiments_analysis_web_application.git
+cd Sentiments_analysis_web_application
 ```
 
-**Pour NLTK, télécharger les ressources nécessaires** :
+### 2. Installe l’environnement Python
+
+```bash
+pip install -r requirements.txt
+# ou, si requirements.txt absent :
+pip install streamlit pandas numpy matplotlib seaborn scikit-learn nltk wordcloud
+```
+
+**Pour NLTK** (si tu utilises les notebooks ou veux réentraîner) :
+
 ```python
 import nltk
 nltk.download('stopwords')
@@ -131,41 +92,90 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 ```
 
+### 3. Place les fichiers modèles
+
+- Pour l’application web : place `twitter_model.pkl` et `twitter_vectorizer.pkl` (présents dans `twitter_sentiment_model_v2/`) à la racine du projet ou adapte les chemins dans `app.py` si besoin.
+
 ---
 
-## 🚀 Reproduire l’expérience
+## 🚀 Lancer l’Application Web
 
-1. **Télécharge le dataset** sur Kaggle et place-le dans `data/sentiment_analysis.csv`
-2. **Ouvre les notebooks dans l’ordre** :
-   - `notebooks/1_data_exploration.ipynb`
-   - `notebooks/2_data_preprocessing.ipynb`
-   - `notebooks/3_model_training_evaluation.ipynb`
-3. **Exécute chaque cellule** pour suivre le pipeline complet
-4. **Les modèles et vectoriseurs** sont sauvegardés dans `models/` à la fin du notebook 3
+### Sur ton PC (local)
+
+```bash
+streamlit run app.py
+```
+
+- L’application s’ouvre dans le navigateur à l’adresse indiquée (par défaut [http://localhost:8501](http://localhost:8501)).  
+- Tu peux y soumettre du texte pour prédire le sentiment.
+
+### Depuis un téléphone (via le réseau local)
+
+1. Lance Streamlit avec l’option `--server.address 0.0.0.0` :
+
+   ```bash
+   streamlit run app.py --server.address 0.0.0.0
+   ```
+
+2. Note l’adresse IP de ton ordinateur (ex : `192.168.1.42`).
+3. Depuis le navigateur de ton téléphone, ouvre :  
+   `http://192.168.1.42:8501`  
+   (Assure-toi que ton téléphone et ton PC sont sur le même réseau Wifi.)
+
+#### Alternative : Exposer sur Internet
+
+- Utilise un service comme [ngrok](https://ngrok.com/) pour obtenir une URL publique temporaire :
+
+  ```bash
+  ngrok http 8501
+  ```
+
+- Suis les instructions pour accéder à l’application depuis n’importe où.
 
 ---
 
 ## 📊 Résultats attendus
 
-- Visualisations détaillées sur la structure et la répartition des données
-- Texte nettoyé, vectorisé et prêt pour la modélisation
-- Comparatif objectif des modèles classiques
-- Sélection et justification argumentée du meilleur modèle
-- Prêt pour une intégration (API, app web, etc.)
+- **Modèle actuel** : Classification binaire (positif/négatif)
+- **Précision** : ~77 %
+- **Limite** : Les textes neutres sont classés positifs ou négatifs.
+- **Visualisations** : Si tu utilises les notebooks, tu auras accès à l’analyse exploratoire, la distribution des sentiments, etc.
+
+---
+
+## ❓ Pourquoi avoir changé de modèle ?
+
+- Le premier modèle, entraîné sur un petit dataset, n’a pas généralisé correctement sur de nouveaux textes : il faisait trop d’erreurs dans l’application web.
+- Le second modèle, basé sur 1,6 million de tweets, connaît un vocabulaire beaucoup plus large et généralise mieux, même si la classification est binaire.
+- Ce choix est un compromis : plus de robustesse et de stabilité, au prix de la perte de la classe « neutre ».
+- L’application web utilise donc **exclusivement le modèle v2** pour fournir des résultats fiables.
+
+---
+
+## 📁 Pour aller plus loin
+
+- Pour comprendre le pipeline initial, explore les notebooks du dossier `notebooks/`.
+- Pour réentraîner le nouveau modèle ou l’améliorer, consulte le dossier `twitter_sentiment_model_v2/` et son README.
+- Idées d’amélioration :  
+  - Intégration d’une classe « neutre » (avec un dataset adapté)
+  - Test d’algos avancés (SVM, BERT, etc.)
+  - Meilleure gestion des emojis et du langage informel
 
 ---
 
 ## ✍️ Auteur
 
-- [ThePerformer0](https://github.com/ThePerformer0)  
-Projet développé dans l’organisation **INFO-DECISIO** pour le cours d’informatique décisionnel.
+- [ThePerformer0](https://github.com/ThePerformer0)
+- Email : [fjimmywilson@gmail.com](fjimmywilson@gmail.com)
+
+Ne vous inquitez pas j'ai kiffé faire ce projet, vous n'avez plus qu'à regarder les notebooks et vous amuser à réentrainer les modèles.
 
 ---
 
-## 🙏 Remarques & extensions possibles
+## 🙏 Suggestions & Contributions
 
-- Ce projet constitue une base solide pour expérimenter avec des modèles avancés (Word Embeddings, deep learning, transformers, gestion du déséquilibre des classes…)
-- N’hésite pas à cloner le repo, tester sur d’autres jeux de données ou proposer des améliorations/pull requests !
+- Clone ce repo, expérimente avec d’autres jeux de données, propose des améliorations ou ouvre une pull request !
+- Toute contribution ou suggestion est bienvenue.
 
 ---
 
