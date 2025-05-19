@@ -9,10 +9,10 @@ from nltk.tokenize import word_tokenize
 import nltk
 
 # Téléchargement des ressources NLTK
-# nltk.download('punkt')
-# nltk.download('stopwords')
-# nltk.download('wordnet')
-# nltk.download('omw-1.4')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 # Configuration de la page
 st.set_page_config(
