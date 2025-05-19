@@ -3,6 +3,7 @@ pandas
 matplotlib
 seaborn
 scipy
+nltk
 statsmodels
 jupyter
 streamlit
