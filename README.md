@@ -162,6 +162,20 @@ Projet développé dans l’organisation **INFO-DECISIO** pour le cours d’info
 
 ---
 
+## 🖼️ Aperçu de l’interface de l’application
+
+Voici l’interface de l’application d’analyse de sentiment développée :
+
+### Version ordinateur
+
+![Interface application sur ordinateur](./interface_desktop.png)
+
+### Version mobile
+
+![Interface application sur mobile](./interface_mobile.png)
+
+---
+
 ## 🙏 Remarques & extensions possibles
 
 - Ce projet constitue une base solide pour expérimenter avec des modèles avancés (Word Embeddings, deep learning, transformers, gestion du déséquilibre des classes…)
