@@ -60,6 +60,12 @@ def preprocess_text(text):
     if not isinstance(text, str):
         return ""
     
+    # Vérifie et télécharge 'punkt' si besoin
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', quiet=True)
+    
     # Tokenisation
     tokens = word_tokenize(text)
     
