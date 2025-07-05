@@ -1,6 +1,6 @@
 # Analyse de Sentiment sur des Commentaires Textuels
 
-Ce projet vise à prédire automatiquement le **sentiment** (positif, neutre, négatif) de commentaires issus des réseaux sociaux. Il a été développé dans le cadre de mon apprentissage personnel pour mais surtout pour montrer à ma communauter comment on entraine un modèle et comment on peut l'utiliser dans une application web. Lien de la démo : ``` https://sentimentsanalysiswebapplication-zqrzahzutpxnfuqyv7q9iy.streamlit.app/ ```
+Ce projet vise à prédire automatiquement le **sentiment** (positif, neutre, négatif) de commentaires issus des réseaux sociaux. Il a été développé dans le cadre de mon apprentissage personnel pour mais surtout pour montrer à ma communauter comment on entraine un modèle et comment on peut l'utiliser dans une application web. Lien de la démo : ` https://sentimentsanalysiswebapplication-zqrzahzutpxnfuqyv7q9iy.streamlit.app/ `
 
 > **💡 Important :**
 > - Une première version du modèle, basée sur un petit dataset, a montré ses limites en production.
